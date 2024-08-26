@@ -24,65 +24,91 @@ const createNewUser = async (email, password, username) => {
 }
 
 const getUserList = async () => {
+    let users = [];
+    users = await db.User.findAll();
+    return users;
+
     // Create the connection to database
-    const connection = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        database: 'jwt',
-        Promise: Bluebird
-    });
-    let user = [];
+    // const connection = await mysql.createConnection({
+    //     host: 'localhost',
+    //     user: 'root',
+    //     database: 'jwt',
+    //     Promise: Bluebird
+    // });
   
-    const [rows, fields] = await connection.execute('SELECT * FROM user');
-    return rows
+    // const [rows, fields] = await connection.execute('SELECT * FROM user');
+    // return rows
 }
 
-const deleteUser = async (id) => {
-    // Create the connection to database
-    const connection = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        database: 'jwt',
-        Promise: Bluebird
+const deleteUser = async (userId) => {
+    // Delete everyone named "Jane"
+    await db.User.destroy({
+        where: {
+        id: userId,
+        },
     });
-    try {
-        const [rows, fields] = await connection.execute('DELETE FROM user WHERE id=?', [id]); 
-        return rows  
-    } catch (error) {
-        console.log(error)
-    }
+    // Create the connection to database
+    // const connection = await mysql.createConnection({
+    //     host: 'localhost',
+    //     user: 'root',
+    //     database: 'jwt',
+    //     Promise: Bluebird
+    // });
+    // try {
+    //     const [rows, fields] = await connection.execute('DELETE FROM user WHERE id=?', [id]); 
+    //     return rows  
+    // } catch (error) {
+    //     console.log(error)
+    // }
 }
 
-const getUserById = async (id) => {
+const getUserById = async (userId) => {
+    let user = {};
+    user = await db.User.findOne({
+        where: {id: userId}
+    })
+    return user;
     // Create the connection to database
-    const connection = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        database: 'jwt',
-        Promise: Bluebird
-    });
-    try {
-        const [rows, fields] = await connection.execute('SELECT * FROM user WHERE id=?', [id]); 
-        return rows  
-    } catch (error) {
-        console.log(error)
-    }
+    // const connection = await mysql.createConnection({
+    //     host: 'localhost',
+    //     user: 'root',
+    //     database: 'jwt',
+    //     Promise: Bluebird
+    // });
+    // try {
+    //     const [rows, fields] = await connection.execute('SELECT * FROM user WHERE id=?', [id]); 
+    //     return rows  
+    // } catch (error) {
+    //     console.log(error)
+    // }
 }
 
-const updateUserInfor = async (email, username, id) => {
+const updateUserInfor = async (userEmail, userUsername, userId) => {
+    // Change everyone without a last name to "Doe"
+    await db.User.update(
+        { 
+            email: userEmail, 
+            username: userUsername,
+        },
+        {
+        where: {
+            id: userId,
+        },
+        },
+    );
     // Create the connection to database
-    const connection = await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        database: 'jwt',
-        Promise: Bluebird
-    });
-    try {
-        const [rows, fields] = await connection.execute('UPDATE user SET email = ?, username = ? WHERE id = ?', [email, username, id]); 
-        return rows  
-    } catch (error) {
-        console.log(error)
-    }
+    // const connection = await mysql.createConnection({
+    //     host: 'localhost',
+    //     user: 'root',
+    //     database: 'jwt',
+    //     Promise: Bluebird
+    // });
+    // try {
+    //     const [rows, fields] = await connection.execute('UPDATE user SET email = ?, username = ? WHERE id = ?', [email, username, id]); 
+    //     return rows  
+    // } catch (error) {
+    //     console.log(error)
+    // }
 }
 
 module.exports = {
