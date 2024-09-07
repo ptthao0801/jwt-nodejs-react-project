@@ -58,11 +58,11 @@ const registerNewUser = async (rawUserData) => {
         email: rawUserData.email,
         username: rawUserData.username,
         password: hashPassword,
-        phone: hashPassword.phone
+        phone: rawUserData.phone
     })
 
     return {
-        EM: 'A user is successfully created!',
+        EM: 'Your account is successfully created!',
         EC: 0
     }
     } catch (error) {
