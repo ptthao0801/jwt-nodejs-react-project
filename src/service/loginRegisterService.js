@@ -1,5 +1,7 @@
+import { where } from "sequelize";
 import db from "../models/models/index";
 import bcrypt from 'bcryptjs';
+import {Op} from "sequelize";
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -34,37 +36,37 @@ const checkPhoneExist = async (userPhone) => {
 
 const registerNewUser = async (rawUserData) => {
     try {
-    //check if email/phone exists
-    let isEmailExist = await checkEmailExist(rawUserData.email);
-    if(isEmailExist === true){
-        return {
-            EM: 'Email already exists',
-            EC: 1
+        //check if email/phone exists
+        let isEmailExist = await checkEmailExist(rawUserData.email);
+        if(isEmailExist === true){
+            return {
+                EM: 'Email already exists',
+                EC: 1
+            }
         }
-    }
 
-    let isPhoneExist = await checkPhoneExist(rawUserData.phone);
-    if(isPhoneExist === true){
-        return {
-            EM: 'Phone number already exists',
-            EC: 1
+        let isPhoneExist = await checkPhoneExist(rawUserData.phone);
+        if(isPhoneExist === true){
+            return {
+                EM: 'Phone number already exists',
+                EC: 1
+            }
         }
-    }
-    //hash password
-    let hashPassword = hashUserPassword(rawUserData.password);
+        //hash password
+        let hashPassword = hashUserPassword(rawUserData.password);
 
-    //create new user
-    await db.User.create({
-        email: rawUserData.email,
-        username: rawUserData.username,
-        password: hashPassword,
-        phone: rawUserData.phone
-    })
+        //create new user
+        await db.User.create({
+            email: rawUserData.email,
+            username: rawUserData.username,
+            password: hashPassword,
+            phone: rawUserData.phone
+        })
 
-    return {
-        EM: 'Your account is successfully created!',
-        EC: 0
-    }
+        return {
+            EM: 'Your account is successfully created!',
+            EC: 0
+        }
     } catch (error) {
         console.log(error)
         return {
@@ -74,6 +76,53 @@ const registerNewUser = async (rawUserData) => {
     }
 }
 
+const checkPassword = (inputPassword, hashPassword) => {
+    return bcrypt.compareSync(inputPassword, hashPassword);
+}
+
+const handleUserLogin = async (rawData) => {
+    try {
+        //check if email/phone exists
+        let user = await db.User.findOne({
+            where: {
+                [Op.or]: [
+                    {email: rawData.valueLogin},
+                    {phone: rawData.valueLogin}
+                ]
+            }
+        })
+        console.log('>>> user: ', user)
+
+        //if user exists -> check password
+        if(user){
+            console.log('User found!')
+            let isCorrectPassword = checkPassword(rawData.password, user.password)
+            if(isCorrectPassword === true) {
+                return {
+                    EM: 'Login successully!',
+                    EC: 0,
+                    DT: ''
+                }
+            }
+        } 
+        console.log('User not found: ', rawData.valueLogin, 'password: ', rawData.password)
+            
+        
+
+
+        // true -> home
+        
+    } catch (error) {
+        console.log(error)
+        return {
+            EM: 'something is wrong in service', //error message
+            EC: '-1', //error code
+            DT: '' //data
+        }
+    }
+}
+
 module.exports = {
-    registerNewUser
+    registerNewUser,
+    handleUserLogin
 }
