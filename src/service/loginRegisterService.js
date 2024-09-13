@@ -103,13 +103,23 @@ const handleUserLogin = async (rawData) => {
                     EC: 0,
                     DT: ''
                 }
+            } else {
+                console.log(">>> WRONG PASSWORD! with email address/phone: ", rawData.valueLogin)
+                return {
+                    EM: 'Your email address/password is incorrect!',
+                    EC: -1,
+                    DT: ''
+                }
             }
-        } 
-        console.log('User not found: ', rawData.valueLogin, 'password: ', rawData.password)
-            
+        } else {
+            console.log(">>> WRONG EMAIL ADDRESS/PHONE", rawData.valueLogin)
+            return {
+                EM: 'Your email address/password is incorrect!',
+                EC: -1,
+                DT: ''
+            }
+        }            
         
-
-
         // true -> home
         
     } catch (error) {
