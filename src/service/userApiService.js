@@ -21,7 +21,49 @@ const getAllUser = async () => {
             }
         }
     } catch (error) {
+        console.log(error);
+        return {
+            EM: 'Something is wrong in service',
+            EC: 1,
+            DT: []
+        }
+    }
+}
+
+const getUserWithPagination = async (page, limit) => {
+    try {
+        let offSet = (page - 1) * limit;
+
+        const {count, rows} = await db.User.findAndCountAll({
+            offset: offSet,
+            limit: limit
+        })
+
+        let totalPages = Math.ceil(count/limit);
+
+        console.log('check total pages: ', totalPages)
+
+        let data = {
+            totalRows: count,
+            totalPages: totalPages,
+            users: rows
+        }
+
+        console.log('>>>>>>>> check data: ', data);
+
+        return {
+            EM: 'Success',
+            EC: 0,
+            DT: data
+        }
+
+    } catch (error) {
         console.log(error)
+        return {
+            EM: 'Something is wrong in service',
+            EC: 1,
+            DT: []
+        }
     }
 }
 
@@ -62,5 +104,5 @@ const deleteUser = async (id) => {
 }
 
 module.exports = {
-    getAllUser, createNewUser, updateUser, deleteUser
+    getAllUser, createNewUser, updateUser, deleteUser, getUserWithPagination
 }
