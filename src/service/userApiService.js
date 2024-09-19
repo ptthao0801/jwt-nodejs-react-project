@@ -92,6 +92,7 @@ const updateUser = async (data) => {
         }
     } catch (error) {
         console.log(error)
+        
     }
 }
 
