@@ -1,4 +1,5 @@
 import db from '../models/models/index';
+import {checkEmailExist, checkPhoneExist, hashUserPassword} from './loginRegisterService';
 
 const getAllUser = async () => {
     try {
@@ -37,8 +38,9 @@ const getUserWithPagination = async (page, limit) => {
         const {count, rows} = await db.User.findAndCountAll({
             offset: offSet,
             limit: limit,
-            attributes: ['id', 'username', 'email', 'phone', 'sex'],
-            include: {model: db.Group, attributes: ['name', 'description']}
+            attributes: ['id', 'username', 'email', 'phone', 'sex', 'address'],
+            include: {model: db.Group, attributes: ['name', 'description', 'id']},
+            order: [['id', 'DESC']]
         })
 
         let totalPages = Math.ceil(count/limit);
@@ -71,7 +73,33 @@ const getUserWithPagination = async (page, limit) => {
 
 const createNewUser = async (data) => {
     try {
-        await db.User.create({})
+        //check if email/phone exists
+        let isEmailExist = await checkEmailExist(data.email);
+        if(isEmailExist === true){
+            return {
+                EM: 'Email already exists',
+                EC: 1,
+                DT: 'email'
+            }
+        }
+
+        let isPhoneExist = await checkPhoneExist(data.phone);
+        if(isPhoneExist === true){
+            return {
+                EM: 'Phone number already exists',
+                EC: 1,
+                DT: 'phone'
+            }
+        }
+        //hash password
+        let hashPassword = hashUserPassword(data.password);
+
+        await db.User.create({...data, password: hashPassword})
+        return {
+            EM: 'Successully created a new user!',
+            EC: 0,
+            DT: data
+        }
     } catch (error) {
         console.log(error)
     }
@@ -79,20 +107,44 @@ const createNewUser = async (data) => {
 
 const updateUser = async (data) => {
     try {
-        let user = await db.user.findOne({
+        if(!data.groupId){
+            return {
+                EM: 'Error with empty GroupId',
+                EC: 1,
+                DT: 'group'
+            }
+        }
+        let user = await db.User.findOne({
             where: {id: data.id}
         })
         if(user){
             //update
-            user.save({
-
+            await user.update({
+                username: data.username,
+                address: data.address,
+                sex: data.sex,
+                groupId: data.groupId
             })
+            return {
+                EM: 'Saved changes!',
+                EC: 0,
+                DT: user
+            }
         } else {
             //not found
+            return {
+                EM: 'User not found',
+                EC: 2,
+                DT: ''
+            }
         }
     } catch (error) {
         console.log(error)
-        
+        return {
+            EM: 'Something is wrong in service update',
+            EC: 1,
+            DT: []
+        }
     }
 }
 
