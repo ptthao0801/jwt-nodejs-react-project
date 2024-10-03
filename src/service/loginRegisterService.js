@@ -1,7 +1,10 @@
+require('dotenv').config();
 import { where } from "sequelize";
 import db from "../models/models/index";
 import bcrypt from 'bcryptjs';
 import {Op} from "sequelize";
+import {getGroupWithRoles} from './JWTservice';
+import {createJWT} from '../middleware/JWTactions';
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -60,7 +63,8 @@ const registerNewUser = async (rawUserData) => {
             email: rawUserData.email,
             username: rawUserData.username,
             password: hashPassword,
-            phone: rawUserData.phone
+            phone: rawUserData.phone,
+            groupId: 2
         })
 
         return {
@@ -91,17 +95,29 @@ const handleUserLogin = async (rawData) => {
                 ]
             }
         })
-        console.log('>>> user: ', user)
 
         //if user exists -> check password
         if(user){
             console.log('User found!')
             let isCorrectPassword = checkPassword(rawData.password, user.password)
             if(isCorrectPassword === true) {
+
+                // test roles
+                console.log('test ROLE >>>>>>>>>...')
+                let groupWithRoles = await getGroupWithRoles(user);
+                let payload = {
+                    email: user.email,
+                    groupWithRoles,
+                    expiresIn: process.env.JWT_EXPIRES_IN
+                }
+                let token = createJWT(payload);
                 return {
                     EM: 'Login successully!',
                     EC: 0,
-                    DT: ''
+                    DT: {
+                        access_token: token,
+                        groupWithRoles
+                    }
                 }
             } else {
                 console.log(">>> WRONG PASSWORD! with email address/phone: ", rawData.valueLogin)

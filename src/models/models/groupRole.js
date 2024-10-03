@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const role = require('./role');
 module.exports = (sequelize, DataTypes) => {
   class Group_Role extends Model {
     /**
@@ -15,12 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   };
   // object-relational mapping
   Group_Role.init({
-    email: DataTypes.STRING,
-    password: DataTypes.STRING,
-    username: DataTypes.STRING,
-    address: DataTypes.STRING,
-    phone: DataTypes.STRING,
-    groupId: DataTypes.INTEGER
+    groupId: DataTypes.INTEGER,
+    roleId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Group_Role',

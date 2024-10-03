@@ -32,6 +32,3 @@ app.listen(PORT, () => {
     console.log(">>> JWT Backend is running on the port = " + PORT);
 })
 
-//test jwt
-createJWT();
-verifyToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidGhhbyIsImFkZHJlc3MiOiJoYSBub2kiLCJpYXQiOjE3Mjc4OTM0MjB9.XE026MtU0z_e5AXFctRrmzBLwl5qxaZJR-iPRWCkQ3s')
