@@ -11,8 +11,8 @@ const handleAbout = (req,res) => {
 
 // khai bao bat dong bo voi function nay, bat phai cho getUserList() vi getUserList() can lam xong moi chay duoc function nay, neu ko cho -> undefined
 const handleUserPage = async (req,res) => {
+    
     let userList = await userService.getUserList();
-
     return res.render('user.ejs', {userList});
 }
 
