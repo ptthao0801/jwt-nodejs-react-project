@@ -5,7 +5,6 @@ const getGroups = async () => {
         let data = await db.Group.findAll({
             order: [['name', 'ASC']]
         });
-        console.log(">>> check data: ", data)
         if (data){
             return {
                 EM: 'Pulled group data successfully!',
